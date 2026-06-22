@@ -1,0 +1,20 @@
+model_list:
+  - model_name: fast-faq
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: deep-support
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: openrouter-fallback
+    litellm_params:
+      model: openrouter/google/gemini-2.5-flash
+      api_key: os.environ/OPENROUTER_API_KEY
+
+router_settings:
+  fallbacks:
+    - fast-faq:
+        - openrouter-fallback
+    - deep-support:
+        - openrouter-fallback

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+chroma_db/
+src/rag/data/document_index.json
+runtime/
+node_modules/
+promptfoo-results.json
+.promptfoo/

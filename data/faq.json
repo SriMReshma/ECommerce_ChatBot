@@ -1,0 +1,59 @@
+[
+  {
+    "id": "FAQ-WAR-001",
+    "category": "warranty",
+    "question": "What is the warranty on the Samsung TV?",
+    "answer": "Samsung Crystal 55 inch 4K TV includes a 1-year comprehensive warranty and a 1-year additional panel warranty. Physical damage, liquid damage, and unauthorized repair are not covered.",
+    "keywords": ["tv warranty", "panel warranty", "Samsung Crystal"]
+  },
+  {
+    "id": "FAQ-RET-002",
+    "category": "returns",
+    "question": "Can I return a phone?",
+    "answer": "Phones can be returned within 7 days if unused, undamaged, and returned with the original box, invoice, supplied cable or charger, and all accessories.",
+    "keywords": ["phone return", "7 days", "accessories"]
+  },
+  {
+    "id": "FAQ-DEL-003",
+    "category": "delivery",
+    "question": "How long does delivery take?",
+    "answer": "Metro delivery usually takes 1-2 business days after dispatch. Non-metro delivery usually takes 3-5 business days. Large TVs may need an extra day for appointment-based delivery.",
+    "keywords": ["delivery", "metro", "non-metro"]
+  },
+  {
+    "id": "FAQ-CAN-004",
+    "category": "cancellation",
+    "question": "Can I cancel my order?",
+    "answer": "Orders can be cancelled before they are shipped. Shipped or delivered orders cannot be cancelled and must follow the returns process if eligible.",
+    "keywords": ["cancel order", "shipped", "processing"]
+  },
+  {
+    "id": "FAQ-REF-005",
+    "category": "refunds",
+    "question": "When will I receive my refund?",
+    "answer": "Refunds are initiated after the returned item passes inspection. UPI and wallet refunds usually take 1-2 business days; card and netbanking refunds usually take 5-7 business days.",
+    "keywords": ["refund", "inspection", "wallet", "card"]
+  },
+  {
+    "id": "FAQ-SET-006",
+    "category": "setup",
+    "question": "How do I set up the StreamBox X1?",
+    "answer": "Connect StreamBox X1 to HDMI, join Wi-Fi, sign in to streaming apps, and pair the voice remote from Settings. A minimum 25 Mbps broadband connection is recommended for 4K streaming.",
+    "keywords": ["StreamBox", "setup", "HDMI", "Wi-Fi"]
+  },
+  {
+    "id": "FAQ-PRI-007",
+    "category": "privacy",
+    "question": "Should I wipe my phone before return or exchange?",
+    "answer": "Customers must back up data, remove screen locks, sign out of accounts, and factory reset phones before return or exchange pickup.",
+    "keywords": ["factory reset", "privacy", "exchange"]
+  },
+  {
+    "id": "FAQ-UNK-008",
+    "category": "support",
+    "question": "How should unsupported questions be handled?",
+    "answer": "If a policy is not present in the knowledge base, the assistant should avoid guessing, acknowledge the limitation, and offer to collect details or escalate.",
+    "keywords": ["unknown", "fallback", "no guessing"]
+  }
+]
+

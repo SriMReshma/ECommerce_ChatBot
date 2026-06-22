@@ -1,0 +1,146 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      - /bin/sh
+      - -c
+      - mkdir -p /tmp/ecombot-chainlit && exec python -m chainlit run src/ui/app.py --host 0.0.0.0 --port 8000 --headless
+    environment:
+      CHAINLIT_APP_ROOT: /tmp/ecombot-chainlit
+      ECOMBOT_RUNTIME_MODE: ${ECOMBOT_RUNTIME_MODE:-deterministic}
+      SESSION_BACKEND: ${SESSION_BACKEND:-redis}
+      DATA_BACKEND: ${DATA_BACKEND:-postgres}
+      HISTORY_BACKEND: ${HISTORY_BACKEND:-postgres}
+      ECOMBOT_USE_CHROMADB: "true"
+      ECOMBOT_USE_MCP: "true"
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-ecombot_redis_password}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-ecombot}
+      POSTGRES_USER: ${POSTGRES_USER:-ecombot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ecombot_password}
+      LITELLM_BASE_URL: http://litellm:4000
+      MCP_HOST: inprocess
+      MCP_TRANSPORT: inprocess
+      LANGSMITH_TRACING: ${LANGSMITH_TRACING:-false}
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-ecombot-capstone}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000', timeout=5)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "-m", "uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      ECOMBOT_RUNTIME_MODE: ${ECOMBOT_RUNTIME_MODE:-deterministic}
+      SESSION_BACKEND: redis
+      DATA_BACKEND: postgres
+      HISTORY_BACKEND: postgres
+      ECOMBOT_USE_CHROMADB: "true"
+      ECOMBOT_USE_MCP: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-ecombot_redis_password}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-ecombot}
+      POSTGRES_USER: ${POSTGRES_USER:-ecombot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ecombot_password}
+      MCP_HOST: inprocess
+      MCP_TRANSPORT: inprocess
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LANGSMITH_TRACING: ${LANGSMITH_TRACING:-false}
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-ecombot-capstone}
+    ports:
+      - "${API_PORT:-8001}:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=5)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ecombot}
+      POSTGRES_USER: ${POSTGRES_USER:-ecombot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ecombot_password}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecombot} -d ${POSTGRES_DB:-ecombot}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:-ecombot_redis_password}"]
+    ports:
+      - "${REDIS_PORT:-6380}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-ecombot_redis_password}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    profiles: ["litellm"]
+    command: ["--config", "/app/litellm_config.yaml", "--port", "4000"]
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm_config.yaml:/app/litellm_config.yaml:ro
+
+  promptfoo:
+    image: promptfoo/promptfoo:latest
+    profiles: ["eval"]
+    command: ["eval", "-c", "/workspace/evals/promptfooconfig.yaml", "--no-cache"]
+    environment:
+      PROMPTFOO_DISABLE_TELEMETRY: "true"
+      PROMPTFOO_API_BASE_URL: http://api:8001
+    volumes:
+      - ./:/workspace:ro
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:

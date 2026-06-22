@@ -1,0 +1,2 @@
+"""FastMCP-compatible backend package."""
+

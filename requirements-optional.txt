@@ -1,0 +1,4 @@
+reportlab
+faster-whisper
+piper-tts
+livekit-agents

@@ -1,0 +1,15 @@
+pytest==8.4.1
+python-dotenv>=1.0.1,<2.0
+google-adk>=1.31,<2
+langchain>=1.2,<2
+langchain-core>=1.2,<2
+langsmith>=0.7,<1
+litellm>=1.80,<2
+chromadb>=1.1,<2
+pypdf>=5,<7
+psycopg2-binary>=2.9,<3
+redis>=7,<9
+fastmcp>=2.2,<3
+chainlit>=2.11,<3
+fastapi>=0.115,<1
+uvicorn>=0.34,<1
